@@ -27,6 +27,13 @@ public class UsersController {
         model.addAttribute("user", user);
         return "user";
     }
+    @GetMapping("/userProfile")
+    public String showUserSingle(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(auth.getName());
+        model.addAttribute("user", user);
+        return "userProfile";
+    }
 
     @GetMapping("admin/{id}")
     public String getUserById(@PathVariable("id") Long id, Model model) {
@@ -36,9 +43,11 @@ public class UsersController {
 
     @GetMapping("admin")
     public String listUsers(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(auth.getName());
+        model.addAttribute("user", user);
         model.addAttribute("users", userService.listOfUsers());
         model.addAttribute("roles", userService.listRoles());
-
         return "users";
     }
 
