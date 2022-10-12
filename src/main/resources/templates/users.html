@@ -114,7 +114,7 @@
 
                                                     <div class="form-group">
                                                         <input th:type="hidden" class="form-control" id="id_modal"
-                                                               th:value="${user.id}"
+                                                               th:value="${user.id} "
                                                                th:name="id">
                                                     </div>
 
@@ -123,7 +123,7 @@
                                                                class="col-form-label"><b>Имя:</b></label>
                                                         <input type="text" class="form-control" id="username_modal"
                                                                th:value="${user.username}"
-                                                               th:name="username">
+                                                               th:name="username" readonly>
                                                     </div>
 
                                                     <div class="form-group">
@@ -131,7 +131,7 @@
                                                                class="col-form-label"><b>Пол:</b></label>
                                                         <input type="text" class="form-control" id="userGender_modal"
                                                                th:value="${user.gender}"
-                                                               th:name="gender">
+                                                               th:name="gender" readonly>
                                                     </div>
 
 
@@ -140,21 +140,21 @@
                                                                class="col-form-label"><b>Позывной:</b></label>
                                                         <input type="text" class="form-control" id="userNickname_modal"
                                                                th:value="${user.nickname}"
-                                                               th:name="nickname">
+                                                               th:name="nickname" readonly>
                                                     </div>
 
                                                     <div class="form-group">
                                                         <label for="user.password" class="col-form-label"><b>Пароль:</b></label>
                                                         <input type="text" class="form-control" id="password_modal"
-                                                               th:name="password">
+                                                               th:name="password" readonly>
                                                     </div>
                                                     <label for="user.roles"><b>Права доступа</b></label>
                                                     <select multiple class="form-control form-control-sm"
-                                                            id="user.roles" th:name="roles" size="2" required>
+                                                            id="user.roles" th:name="roles" size="2" required readonly>
                                                         <option th:each="name: ${roles}"
                                                                 th:name="name"
                                                                 th:text="${name.name.substring(5)}" th:value="${name.id}"
-                                                                class="m-2"/>
+                                                                class="m-2"  />
                                                         </th:block>
                                                     </select>
 
