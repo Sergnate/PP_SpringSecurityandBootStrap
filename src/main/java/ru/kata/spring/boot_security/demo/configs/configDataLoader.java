@@ -17,14 +17,14 @@ public class configDataLoader implements ApplicationListener<ContextRefreshedEve
     private final static long ROLE_ADMIN = 1;
     private final static long ROLE_USER = 2;
 
-    private final UserRepository userRepo;
+    private final UserRepository repo;
 
     private final RoleRepository roleRepository;
 
     private final PasswordEncoder passwordEncoder;
     @Autowired
-    public configDataLoader(UserRepository userRepo, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-        this.userRepo = userRepo;
+    public configDataLoader(UserRepository repo, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.repo = repo;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -32,7 +32,7 @@ public class configDataLoader implements ApplicationListener<ContextRefreshedEve
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        Iterable<User> users = userRepo.findAll();
+        Iterable<User> users = repo.findAll();
         if (users.iterator().hasNext() == false) {
             Role adminRole = new Role(ROLE_ADMIN, "ROLE_ADMIN");
             Role userRole = new Role(ROLE_USER, "ROLE_USER");
@@ -45,11 +45,11 @@ public class configDataLoader implements ApplicationListener<ContextRefreshedEve
 
             User admin = new User();
             admin.setUsername("admin");
-            admin.setNickname("Admin");
-            admin.setGender("man");
+            admin.setUserNickname("Admin");
+            admin.setUserGender("man");
             admin.setPassword(passwordEncoder.encode("admin"));
             admin.setRoles(adminRoles);
-            userRepo.save(admin);
+            repo.save(admin);
         }
     }
 

@@ -1,6 +1,8 @@
 package ru.kata.spring.boot_security.demo.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,10 +23,10 @@ public class User implements UserDetails {
     private Long id;
     @Column(name = "username", unique = true)
     private String username;
-    @Column(name = "USER_GENDER")
-    private String gender;
-    @Column(name = "USER_NICKNAME")
-    private String nickname;
+    @Column(name = "USER_Gender")
+    private String userGender;
+    @Column(name = "USER_Nickname")
+    private String userNickname;
     @Column(name = "password")
     private String password;
 
@@ -32,15 +34,19 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name="user_role", joinColumns=@JoinColumn(name="user_id"),
             inverseJoinColumns=@JoinColumn(name="role_id"))
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id"
+    )
     private Set<Role> roles;
 
     public User() {
     }
 
-    public User(Long id, String username, String gender, String nickname, String password, Set<Role> roles) {
+    public User(Long id, String username, String userGender, String userNickname, String password, Set<Role> roles) {
         this.username = username;
-        this.gender = gender;
-        this.nickname = nickname;
+        this.userGender = userGender;
+        this.userNickname = userNickname;
         this.password = password;
         this.roles = roles;
     }
@@ -57,6 +63,15 @@ public class User implements UserDetails {
         this.roles.add(role);
     }
 
+    public String getRolesView() {
+        StringBuilder sb = new StringBuilder();
+        for (Role role : roles) {
+            sb.append(role.getName().substring(5));
+            sb.append(" ");
+        }
+        return sb.toString();
+    }
+
     public Long getId() {
         return id;
     }
@@ -65,32 +80,37 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public String getGender() {
-        return gender;
+    public String getUserGender() {
+        return userGender;
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setUserGender(String userGender) {
+        this.userGender = userGender;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getUserNickname() {
+        return userNickname;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setUserNickname(String userNickname) {
+        this.userNickname = userNickname;
     }
 
     @Override
     public String toString() {
-        return "User: ID: %d, userName: '%s', gender: %s, nickname: '%s', password: '%s'".formatted(id, username, gender, nickname, password);
+        return "User{" +
+                "id=" + id +
+                ", userName='" + username + '\'' +
+                ", userGender=" + userGender +
+                ", userNickname='" + userNickname + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream().map(r -> new SimpleGrantedAuthority(r.getAuthority())).collect(Collectors.toList());
     }
-
 
     @Override
     public String getPassword() {

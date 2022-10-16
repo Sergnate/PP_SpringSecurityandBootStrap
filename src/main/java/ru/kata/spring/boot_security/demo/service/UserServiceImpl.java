@@ -20,14 +20,14 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements  UserService, UserDetailsService {
 
-    private UserRepository userRepo;
+    private UserRepository UserRepo;
     private RoleRepository roleRepository;
     private  PasswordEncoder passwordEncoder;
 
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepo, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-        this.userRepo = userRepo;
+    public UserServiceImpl(UserRepository UserRepo, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+        this.UserRepo = UserRepo;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -35,26 +35,26 @@ public class UserServiceImpl implements  UserService, UserDetailsService {
     @Override
     public void addUser(User user) {
          user.setPassword(passwordEncoder.encode(user.getPassword()));
-         userRepo.save(user);
+         UserRepo.save(user);
     }
     @Override
     public User getUserById(Long id) {
-        return userRepo.findById(id).get();
+        return UserRepo.findById(id).get();
     }
     @Override
     public List<User> listOfUsers() {
-        return userRepo.findAll();
+        return UserRepo.findAll();
     }
     @Override
     public void deleteUser(Long id) {
-        userRepo.deleteById(id);
+        UserRepo.deleteById(id);
     }
 
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findByUsername(username);
+        User user = UserRepo.findByUsername(username);
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
                 getAuthorities(user.getRoles()));
     }
@@ -65,12 +65,31 @@ public class UserServiceImpl implements  UserService, UserDetailsService {
     }
 
     public User findByUsername(String username) {
-        return userRepo.findByUsername(username);
+        return UserRepo.findByUsername(username);
     }
 
     public List<Role> listRoles() {
         return roleRepository.findAll();
     }
 
+    public void saveAndFlush(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        UserRepo.saveAndFlush(user);
+    }
 
+    public Set<Role> getRoles (ArrayList<Long> roles){
+        return roleRepository.findByIdIn(roles);
+    }
+
+    public ArrayList <Long> rolesToId (Set<Role> roles){
+        ArrayList<Long> rolesId = new ArrayList<>();
+        for (Role role:roles){
+            rolesId.add(Long.valueOf(role.getName()));
+        }
+        return rolesId;
+    }
+
+    public User findByUserName(String userName) {
+        return UserRepo.findByUsername(userName);
+    }
 }
