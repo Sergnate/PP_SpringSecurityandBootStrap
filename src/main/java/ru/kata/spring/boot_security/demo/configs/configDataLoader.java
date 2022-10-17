@@ -1,56 +1,42 @@
 package ru.kata.spring.boot_security.demo.configs;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repository.RoleRepository;
-import ru.kata.spring.boot_security.demo.repository.UserRepository;
-
-import java.util.*;
+import ru.kata.spring.boot_security.demo.service.UserService;
+import javax.annotation.PostConstruct;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
-public class configDataLoader implements ApplicationListener<ContextRefreshedEvent> {
-    private final static long ROLE_ADMIN = 1;
-    private final static long ROLE_USER = 2;
-
-    private final UserRepository repo;
-
-    private final RoleRepository roleRepository;
-
-    private final PasswordEncoder passwordEncoder;
+public class configDataLoader {
     @Autowired
-    public configDataLoader(UserRepository repo, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-        this.repo = repo;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
+    UserService userService;
+    @Autowired
+    PasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    RoleRepository roleRepository;
+
+
+    @PostConstruct
+    void init() {
+        Role userRole = new Role("ROLE_ADMIN");
+        Role adminRole = new Role( "ROLE_USER");
+
+        roleRepository.save(userRole);
+        roleRepository.save(adminRole);
+
+        List<Role> roles = new ArrayList<>();
+
+        roles.add(userRole);
+        roles.add(adminRole);
+
+        User user = new User("admin", "man",  "БигБосс", "admin", roles);
+
+        userService.saveUser(user);
+
     }
-
-    @Override
-    @Transactional
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        Iterable<User> users = repo.findAll();
-        if (users.iterator().hasNext() == false) {
-            Role adminRole = new Role(ROLE_ADMIN, "ROLE_ADMIN");
-            Role userRole = new Role(ROLE_USER, "ROLE_USER");
-            Set<Role> adminRoles = new HashSet<>();
-            adminRoles.add(adminRole);
-            Set<Role> userRoles = new HashSet<>();
-            userRoles.add(userRole);
-            roleRepository.save(adminRole);
-            roleRepository.save(userRole);
-
-            User admin = new User();
-            admin.setUsername("admin");
-            admin.setUserNickname("Admin");
-            admin.setUserGender("man");
-            admin.setPassword(passwordEncoder.encode("admin"));
-            admin.setRoles(adminRoles);
-            repo.save(admin);
-        }
-    }
-
 }

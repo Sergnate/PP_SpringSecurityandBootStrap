@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:display="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+
+    <meta charset="UTF-8">
+    <title>users info</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <style>
+        .navbar{
+            color: white;
+        }
+    </style>
+    <script>
+        function show(shown, hidden) {
+            document.getElementById(shown).style.display = 'block';
+            document.getElementById(hidden).style.display = 'none';
+            return false;
+        }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js">
+    </script>
+</head>
+<body>
+
+
+
+<!--  ГЛАВНАЯ НАВИГАЦИОННАЯ ПАНЕЛЬ    -->
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+        <div>
+            <span class="navbar-text text-white font-weight-bold"  th:text="${currentUser.getUsername()}"></span>
+            <span class="navbar-text text-white">с правами доступа: </span>
+            <span class="navbar-text text-white" th:text="${currentUser.getRolesString()}"></span>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="btn btn-dark">Выйти</button>
+        </form>
+    </div>
+</nav>
+
+
+<div class="container-fluid bg-light">
+
+    <div class="row">
+        <div class="col-2 bg-white pt-3 min-vh-100 px-0">
+            <div class="container-fluid px-0">
+                <ul class="nav flex-column nav-pills ">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Администратор</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user">Пользователь</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+
+<!--        Панель Админа-->
+
+        <div class="col-10">
+
+            <div class="container-fluid" id="showUsers">
+                <br>
+                <h1>Панель Администратора</h1>
+                <br>
+                <div>
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" onclick="return show('showUsers','addUser');">Пользователи</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link"  onclick="return show('addUser','showUsers');">Добавить пользователя</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-block">
+
+                        <div class="col border bg-light">
+                            <h4 style="padding: 10px 10px 10px 15px">Пользователи</h4>
+                        </div>
+                        <div class="container-fluid border bg-white py-3 px-4" id="info">
+                            <table class="table table-hover" id="mainTableWithUsers">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Имя</th>
+                                        <th>Пол</th>
+                                        <th>Позывной</th>
+                                        <th>Права доступа</th>
+                                    </tr>
+                                </thead>
+                                <tbody  id="data">
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+<!--        Добавление нового юзера-->
+        <div class="container-fluid" id="addUser" style="display: none">
+            <br>
+            <h1>Панель Администратора</h1>
+            <br>
+            <div>
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link" onclick="return show('showUsers','addUser');">Пользователи</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" onclick="return show('addUser','showUsers');">Добавить пользователя</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="card-block">
+                    <div class="col border bg-light">
+                        <h4 style="padding: 10px 10px 10px 15px">Добавить нового пользователя</h4>
+                    </div>
+                    <div class="container-fluid border bg-white py-3 px-4">
+                        <form class="addForm" id="createUser" style="text-align: center; font-weight:bold">
+                            <div class="form-group col-4 container-sm bg-white justify-content-center">
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="username" class="col-form-label">Имя</label>
+                                        <input type="text" class="form-control" id="username" name="username" placeholder="Имя">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="userGender" class="col-form-label">Пол</label>
+                                        <input type="text" class="form-control" id="userGender" name="userGender" placeholder="Пол">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="userNickname" class="col-form-label">Позывной</label>
+                                        <input type="userNickname" class="form-control" id="userNickname" name="userNickname" placeholder="Позывной">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password" class="col-form-label">Пароль</label>
+                                        <input type="password" class="form-control" id="password" name="password" placeholder="Пароль">
+                                    </div>
+                                    <div class="form-group">
+                                        <strong><label for="role">Права доступа</label></strong>
+                                        <select multiple class="custom-select w-100"
+                                                size="2" id="role" name="role">
+                                            <option
+                                                    th:each="role : ${rolesList}"
+                                                    th:text="${role.getName()}"
+                                                    th:value="${role.name}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="submit" id="btnAdd" class="btn btn-success" value="Добавить пользователя">
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+            <!--Модальное окно для редактирования-->
+
+            <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Редактировать</h5>
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form style="text-align: center; font-weight:bold" class="editModalForm">
+                                <div class="form-group col-8 container-sm bg-white justify-content-center">
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="edId" class="col-form-label">ID</label>
+                                            <input class="form-control" type="number" readonly id="edId" name="id">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edUsername" class="col-form-label">Имя</label>
+                                            <input type="text" class="form-control" id="edUsername" name="username">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edUserGender" class="col-form-label">Пол</label>
+                                            <input type="text" class="form-control" id="edUserGender" name="userGender" >
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edUserNickname" class="col-form-label">Позывной</label>
+                                            <input type="text" class="form-control" id="edUserNickname" name="userNickname">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="edPassword" class="col-form-label">Пароль</label>
+                                            <input type="text" class="form-control" id="edPassword" name="password">
+                                        </div>
+                                        <div class="form-group">
+                                            <strong><label for="editRole">Права доступа</label></strong>
+                                            <select multiple class="custom-select w-100"
+                                                    size="2" id="editRole" name="role">
+                                                <option
+                                                        th:each="role : ${rolesList}"
+                                                        th:text="${role.getName()}"
+                                                        th:value="${role.name}">
+                                                </option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                    <input type="submit" class="btn btn-primary" value="Редактировать">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--Модальное окно для удаления-->
+
+            <div class="modal" tabindex="-1" id="deleteModal" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">Удалить пользователя</h5>
+                            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form style="text-align: center; font-weight:bold" class="deleteModalForm">
+                                <div class="form-group col-8 container-sm bg-white justify-content-center">
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label for="delitId" class="col-form-label">ID</label>
+                                            <input class="form-control" type="text" id="delitId" name="id" readonly  >
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="delUsername" class="col-form-label">Имя</label>
+                                            <input type="text" class="form-control" id="delUsername" name="username" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="delUserGender" class="col-form-label">Пол</label>
+                                            <input type="text" class="form-control" id="delUserGender" name="userGender" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="delUserNickname" class="col-form-label">Позывной</label>
+                                            <input type="text" class="form-control" id="delUserNickname" name="userNickname" readonly>
+                                        </div>
+                                        <div class="form-group">
+                                            <strong><label for="delRole">Права доступа</label></strong>
+                                            <select multiple class="custom-select w-100"
+                                                    size="2" id="delRole" name="role" disabled>
+                                                <option
+                                                        th:each="role : ${rolesList}"
+                                                        th:text="${role.getName()}"
+                                                        th:value="${role.name}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                                    <input type="submit" class="btn btn-danger" value="Удалить">
+
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+<script type="text/javascript" th:src="@{getUsers.js}"></script>
+<script type="text/javascript" th:src="@{createUser.js}"></script>
+<script type="text/javascript" th:src="@{showDataInEditModal.js}"></script>
+<script type="text/javascript" th:src="@{showDataInDeleteModal.js}"></script>
+<script type="text/javascript" th:src="@{editUser.js}"></script>
+<script type="text/javascript" th:src="@{deleteUser.js}"></script>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
+<script>
+    getUsers();
+</script>
+</body>
+</html>
+
